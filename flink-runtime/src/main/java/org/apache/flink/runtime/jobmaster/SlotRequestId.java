@@ -24,7 +24,7 @@ import org.apache.flink.util.AbstractID;
 
 /**
  * This ID identifies the request for a logical slot from the Execution to the {@link SlotPool}
- * oe {@link SlotProvider}. The logical slot may be a physical slot or a sub-slot thereof, in
+ * or {@link SlotProvider}. The logical slot may be a physical slot or a sub-slot thereof, in
  * the case of slot sharing.
  *
  * <p>This ID serves a different purpose than the
