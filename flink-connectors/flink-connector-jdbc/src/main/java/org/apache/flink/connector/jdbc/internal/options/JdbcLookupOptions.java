@@ -30,10 +30,14 @@ public class JdbcLookupOptions implements Serializable {
     private final long cacheExpireMs;
     private final int maxRetryTimes;
 
-    public JdbcLookupOptions(long cacheMaxSize, long cacheExpireMs, int maxRetryTimes) {
+    private final boolean lookupAsync;
+
+    public JdbcLookupOptions(
+            long cacheMaxSize, long cacheExpireMs, int maxRetryTimes, boolean lookupAsync) {
         this.cacheMaxSize = cacheMaxSize;
         this.cacheExpireMs = cacheExpireMs;
         this.maxRetryTimes = maxRetryTimes;
+        this.lookupAsync = lookupAsync;
     }
 
     public long getCacheMaxSize() {
@@ -46,6 +50,10 @@ public class JdbcLookupOptions implements Serializable {
 
     public int getMaxRetryTimes() {
         return maxRetryTimes;
+    }
+
+    public boolean isLookupAsync() {
+        return lookupAsync;
     }
 
     public static Builder builder() {

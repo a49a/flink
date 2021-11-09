@@ -25,6 +25,7 @@ import org.apache.flink.connector.jdbc.internal.options.JdbcLookupOptions;
 import org.apache.flink.connector.jdbc.internal.options.JdbcReadOptions;
 import org.apache.flink.connector.jdbc.split.JdbcNumericBetweenParametersProvider;
 import org.apache.flink.table.connector.ChangelogMode;
+import org.apache.flink.table.connector.source.AsyncTableFunctionProvider;
 import org.apache.flink.table.connector.source.DynamicTableSource;
 import org.apache.flink.table.connector.source.InputFormatProvider;
 import org.apache.flink.table.connector.source.LookupTableSource;
@@ -76,15 +77,19 @@ public class JdbcDynamicTableSource
             keyNames[i] = DataType.getFieldNames(physicalRowDataType).get(innerKeyArr[0]);
         }
         final RowType rowType = (RowType) physicalRowDataType.getLogicalType();
-
-        return TableFunctionProvider.of(
-                new JdbcRowDataLookupFunction(
-                        options,
-                        lookupOptions,
-                        DataType.getFieldNames(physicalRowDataType).toArray(new String[0]),
-                        DataType.getFieldDataTypes(physicalRowDataType).toArray(new DataType[0]),
-                        keyNames,
-                        rowType));
+        if (lookupOptions.isLookupAsync()) {
+            return AsyncTableFunctionProvider.of(new JdbcRowDataAsyncLookupFunction());
+        } else {
+            return TableFunctionProvider.of(
+                    new JdbcRowDataLookupFunction(
+                            options,
+                            lookupOptions,
+                            DataType.getFieldNames(physicalRowDataType).toArray(new String[0]),
+                            DataType.getFieldDataTypes(physicalRowDataType)
+                                    .toArray(new DataType[0]),
+                            keyNames,
+                            rowType));
+        }
     }
 
     @Override
