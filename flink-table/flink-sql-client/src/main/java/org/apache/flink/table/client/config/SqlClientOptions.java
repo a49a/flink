@@ -52,6 +52,13 @@ public class SqlClientOptions {
                     .withDescription(
                             "Determine whether to output the verbose output to the console. If set the option true, it will print the exception stack. Otherwise, it only output the cause.");
 
+    @Documentation.TableOption(execMode = Documentation.ExecMode.BATCH_STREAMING)
+    public static final ConfigOption<String> EXECUTION_INIT_FILE =
+            ConfigOptions.key("sql-client.execution.init-file")
+                    .stringType()
+                    .defaultValue(null)
+                    .withDescription("");
+
     // Display options
 
     @Documentation.TableOption(execMode = Documentation.ExecMode.STREAMING)

@@ -35,6 +35,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
@@ -43,6 +44,7 @@ import java.util.Arrays;
 import java.util.function.Supplier;
 
 import static org.apache.flink.table.client.cli.CliClient.DEFAULT_TERMINAL_FACTORY;
+import static org.apache.flink.table.client.config.SqlClientOptions.EXECUTION_INIT_FILE;
 
 /**
  * SQL Client for submitting SQL statements. The client can be executed in two modes: a gateway and
@@ -107,7 +109,7 @@ public class SqlClient {
      * @param sessionId session identifier for the current client.
      * @param executor executor
      */
-    private void openCli(String sessionId, Executor executor) {
+    private void openCli(String sessionId, Executor executor) throws MalformedURLException {
         Path historyFilePath;
         if (options.getHistoryFilePath() != null) {
             historyFilePath = Paths.get(options.getHistoryFilePath());
@@ -131,8 +133,14 @@ public class SqlClient {
         }
 
         try (CliClient cli = new CliClient(terminalFactory, sessionId, executor, historyFilePath)) {
-            if (options.getInitFile() != null) {
-                boolean success = cli.executeInitialization(readFromURL(options.getInitFile()));
+            URL initFile;
+            if (options.getInitFile() == null) {
+                initFile = new URL(executor.getSessionConfig(sessionId).get(EXECUTION_INIT_FILE));
+            } else {
+                initFile = options.getInitFile();
+            }
+            if (initFile != null) {
+                boolean success = cli.executeInitialization(readFromURL(initFile));
                 if (!success) {
                     System.out.println(
                             String.format(
